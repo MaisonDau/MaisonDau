@@ -1,0 +1,21 @@
+name: Contact Form Handler
+
+on:
+  repository_dispatch:
+    types: [contact-form]
+
+jobs:
+  send-email:
+    runs-on: ubuntu-latest
+    steps:
+      - name: Send email via Resend
+        run: |
+          curl -X POST 'https://api.resend.com/emails' \
+          -H 'Authorization: Bearer ${{ secrets.RESEND_API_KEY }}' \
+          -H 'Content-Type: application/json' \
+          -d '{
+            "from": "bonjour@maisondau.ch",
+            "to": "bonjour@maisondau.ch",
+            "subject": "Neue Kontaktanfrage — Maison Dau",
+            "html": "<p><strong>Name:</strong> ${{ github.event.client_payload.name }}</p><p><strong>Email:</strong> ${{ github.event.client_payload.email }}</p><p><strong>Nachricht:</strong> ${{ github.event.client_payload.message }}</p>"
+          }'
